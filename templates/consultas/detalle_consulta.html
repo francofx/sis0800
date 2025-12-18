@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle Consulta - Sistema 0800{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-file-text me-2"></i>Detalle de Consulta #{{ consulta.id }}</h2>
+        <a href="{% url 'informes' %}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-2"></i>Volver a Informes
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Datos Generales -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-info-circle me-2"></i>Datos Generales
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <strong class="text-muted small">Fecha</strong>
+                            <p class="mb-0">{{ consulta.fecha|date:"d/m/Y" }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong class="text-muted small">Zona</strong>
+                            <p class="mb-0">
+                                <span class="badge 
+                                    {% if consulta.zona == 'Sur' %}bg-success
+                                    {% elif consulta.zona == 'Centro - Norte' %}bg-info
+                                    {% elif consulta.zona == 'Norte' %}bg-warning text-dark
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ consulta.zona }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong class="text-muted small">Operador</strong>
+                            <p class="mb-0">{{ consulta.operador }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong class="text-muted small">Tipo de Consulta</strong>
+                            <p class="mb-0">
+                                <span class="badge {% if consulta.consulta == 'Directa' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                    {{ consulta.consulta }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos del Interlocutor -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-person-badge me-2"></i>Datos del Interlocutor
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <strong class="text-muted small">Nombre</strong>
+                            <p class="mb-0">{{ consulta.apellido_nombre_interlocutor }}</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <strong class="text-muted small">Teléfono</strong>
+                            <p class="mb-0">{{ consulta.telefono_interlocutor|default:"-" }}</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <strong class="text-muted small">Vínculo</strong>
+                            <p class="mb-0">{{ consulta.tipo_vinculo|default:"-" }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <strong class="text-muted small">Motivo de la Consulta</strong>
+                            <p class="mb-0">{{ consulta.motivo_consulta }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos del Usuario -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-person me-2"></i>Datos del Usuario
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <strong class="text-muted small">Nombre Completo</strong>
+                            <p class="mb-0 fw-bold">{{ consulta.apellido_nombre_usuario }}</p>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <strong class="text-muted small">DNI</strong>
+                            <p class="mb-0">{{ consulta.dni|default:"-" }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong class="text-muted small">Fecha Nacimiento</strong>
+                            <p class="mb-0">{{ consulta.fecha_nacimiento|default:"-" }}</p>
+                        </div>
+                        <div class="col-md-1 mb-3">
+                            <strong class="text-muted small">Edad</strong>
+                            <p class="mb-0">{{ consulta.edad|default:"-" }}</p>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <strong class="text-muted small">Sexo</strong>
+                            <p class="mb-0">{{ consulta.sexo }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <strong class="text-muted small">Nacionalidad</strong>
+                            <p class="mb-0">{{ consulta.nacionalidad }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong class="text-muted small">Ciudad</strong>
+                            <p class="mb-0">{{ consulta.ciudad }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <strong class="text-muted small">Barrio</strong>
+                            <p class="mb-0">{{ consulta.barrio|default:"-" }}</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <strong class="text-muted small">Dirección</strong>
+                            <p class="mb-0">{{ consulta.direccion|default:"-" }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <strong class="text-muted small">Teléfono</strong>
+                            <p class="mb-0">{{ consulta.telefono|default:"-" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos de Consumo -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning bg-opacity-25">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Datos de Consumo
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <strong class="text-muted small">Tiempo de Consumo</strong>
+                            <p class="mb-0">{{ consulta.tiempo_consumo|default:"-" }}</p>
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <strong class="text-muted small">Tipo de Sustancia</strong>
+                            <p class="mb-0">{{ consulta.tipo_sustancia|default:"-" }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <strong class="text-muted small">Tratamiento Anterior</strong>
+                            <p class="mb-0">
+                                {% if consulta.tratamiento_anterior == 'SI' %}
+                                    <span class="badge bg-success">Sí</span>
+                                {% elif consulta.tratamiento_anterior == 'No' %}
+                                    <span class="badge bg-danger">No</span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <strong class="text-muted small">Tipo de Tratamiento Anterior</strong>
+                            <p class="mb-0">{{ consulta.tipo_tratamiento_anterior|default:"-" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Intervención -->
+            <div class="card mb-4">
+                <div class="card-header bg-info bg-opacity-25">
+                    <i class="bi bi-chat-dots me-2"></i>Intervención Propuesta
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ consulta.intervencion_propuesta|default:"Sin intervención registrada"|linebreaks }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Datos Educativos y Laborales -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-mortarboard me-2"></i>Educación y Trabajo
+                </div>
+                <div class="card-body">
+                    <p><strong>Escolarizado:</strong> {{ consulta.escolarizado|default:"-" }}</p>
+                    <p><strong>Etapa Escolar:</strong> {{ consulta.etapa_escolar|default:"-" }}</p>
+                    <p><strong>Obra Social:</strong> {{ consulta.obra_social|default:"-" }}</p>
+                    <p><strong>Nombre OS:</strong> {{ consulta.nombre_obra_social|default:"-" }}</p>
+                    <p class="mb-0"><strong>Ocupación:</strong> {{ consulta.ocupacion|default:"-" }}</p>
+                </div>
+            </div>
+
+            <!-- Referencia Afectiva -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-heart me-2"></i>Referencia Afectiva
+                </div>
+                <div class="card-body">
+                    <p><strong>Nombre:</strong> {{ consulta.apellido_nombre_referencia|default:"-" }}</p>
+                    <p><strong>DNI:</strong> {{ consulta.dni_referencia|default:"-" }}</p>
+                    <p class="mb-0"><strong>Teléfono:</strong> {{ consulta.telefono_referencia|default:"-" }}</p>
+                </div>
+            </div>
+
+            <!-- Datos de Salud -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-hospital me-2"></i>Salud y Derivación
+                </div>
+                <div class="card-body">
+                    <p><strong>Efector de Salud:</strong> {{ consulta.efector_salud_referencia|default:"-" }}</p>
+                    <p><strong>Riesgo Inminente:</strong> 
+                        {% if consulta.riesgo_inminente == 'SI' %}
+                            <span class="badge bg-danger">Sí</span>
+                        {% else %}
+                            {{ consulta.riesgo_inminente|default:"-" }}
+                        {% endif %}
+                    </p>
+                    <p><strong>Institución Derivado:</strong> {{ consulta.institucion_derivado|default:"-" }}</p>
+                    <p class="mb-0"><strong>Seguimiento:</strong> {{ consulta.seguimiento|default:"-" }}</p>
+                </div>
+            </div>
+
+            <!-- Situación Social -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-people me-2"></i>Situación Social y Judicial
+                </div>
+                <div class="card-body">
+                    <p><strong>Situación Social:</strong> 
+                        {% if consulta.situacion_social %}
+                            <span class="badge bg-warning text-dark">{{ consulta.situacion_social }}</span>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
+                    <p class="mb-0"><strong>Característica Judicial:</strong> 
+                        {% if consulta.caracteristica_judicial %}
+                            <span class="badge bg-dark">{{ consulta.caracteristica_judicial }}</span>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Auditoría -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-clock-history me-2"></i>Auditoría
+                </div>
+                <div class="card-body">
+                    <p><strong>Creado por:</strong> {{ consulta.creado_por|default:"Sistema" }}</p>
+                    <p><strong>Fecha creación:</strong> {{ consulta.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                    <p class="mb-0"><strong>Última modificación:</strong> {{ consulta.fecha_modificacion|date:"d/m/Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

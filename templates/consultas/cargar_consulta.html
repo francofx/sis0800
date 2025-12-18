@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+
+{% block title %}Cargar Consulta - Sistema 0800{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-clipboard-plus me-2"></i>Cargar Nueva Consulta</h2>
+                <span class="badge bg-primary fs-6">
+                    <i class="bi bi-person me-1"></i>Operador: {{ user.first_name }} {{ user.last_name }}
+                </span>
+            </div>
+            
+            <form method="post" id="consultaForm">
+                {% csrf_token %}
+                
+                <!-- Datos Generales -->
+                <div class="form-section">
+                    <h5><i class="bi bi-info-circle me-2"></i>Datos Generales de la Consulta</h5>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Fecha *</label>
+                            {{ form.fecha }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Zona *</label>
+                            {{ form.zona }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Operador *</label>
+                            {{ form.operador }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Tipo de Consulta *</label>
+                            {{ form.consulta }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos del Interlocutor -->
+                <div class="form-section">
+                    <h5><i class="bi bi-person-badge me-2"></i>Datos del Interlocutor</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Apellido y Nombre Interlocutor *</label>
+                            {{ form.apellido_nombre_interlocutor }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Teléfono Interlocutor</label>
+                            {{ form.telefono_interlocutor }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Tipo de Vínculo (si es indirecta)</label>
+                            {{ form.tipo_vinculo }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Motivo de la Consulta *</label>
+                            {{ form.motivo_consulta }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos del Usuario -->
+                <div class="form-section">
+                    <h5><i class="bi bi-person me-2"></i>Datos del Usuario</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Apellido y Nombre Usuario *</label>
+                            {{ form.apellido_nombre_usuario }}
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">DNI</label>
+                            {{ form.dni }}
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Fecha de Nacimiento</label>
+                            {{ form.fecha_nacimiento }}
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Edad</label>
+                            {{ form.edad }}
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Sexo *</label>
+                            {{ form.sexo }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Nacionalidad</label>
+                            {{ form.nacionalidad }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Ciudad *</label>
+                            {{ form.ciudad }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Barrio</label>
+                            {{ form.barrio }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Dirección</label>
+                            {{ form.direccion }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Teléfono</label>
+                            {{ form.telefono }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos Educativos y Laborales -->
+                <div class="form-section">
+                    <h5><i class="bi bi-mortarboard me-2"></i>Datos Educativos y Laborales</h5>
+                    <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Escolarizado</label>
+                            {{ form.escolarizado }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Etapa Escolar</label>
+                            {{ form.etapa_escolar }}
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Obra Social</label>
+                            {{ form.obra_social }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Nombre Obra Social</label>
+                            {{ form.nombre_obra_social }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Ocupación</label>
+                            {{ form.ocupacion }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Referencia Afectiva -->
+                <div class="form-section">
+                    <h5><i class="bi bi-heart me-2"></i>Referencia Afectiva</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Apellido y Nombre</label>
+                            {{ form.apellido_nombre_referencia }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">DNI</label>
+                            {{ form.dni_referencia }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Teléfono</label>
+                            {{ form.telefono_referencia }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos de Consumo -->
+                <div class="form-section">
+                    <h5><i class="bi bi-exclamation-triangle me-2"></i>Datos de Consumo</h5>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Tiempo de Consumo</label>
+                            {{ form.tiempo_consumo }}
+                        </div>
+                        <div class="col-md-9 mb-3">
+                            <label class="form-label">Tipo de Sustancia que Consume</label>
+                            {{ form.tipo_sustancia }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Tratamiento Anterior</label>
+                            {{ form.tratamiento_anterior }}
+                        </div>
+                        <div class="col-md-9 mb-3">
+                            <label class="form-label">Tipo de Tratamiento Anterior</label>
+                            {{ form.tipo_tratamiento_anterior }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos de Salud y Derivación -->
+                <div class="form-section">
+                    <h5><i class="bi bi-hospital me-2"></i>Datos de Salud y Derivación</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Efector de Salud de Referencia</label>
+                            {{ form.efector_salud_referencia }}
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Riesgo Inminente</label>
+                            {{ form.riesgo_inminente }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Institución/Efector Derivado</label>
+                            {{ form.institucion_derivado }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Seguimiento</label>
+                            {{ form.seguimiento }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Situación Social y Judicial -->
+                <div class="form-section">
+                    <h5><i class="bi bi-people me-2"></i>Situación Social y Judicial</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Situación Social</label>
+                            {{ form.situacion_social }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Característica Judicial</label>
+                            {{ form.caracteristica_judicial }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Intervención Propuesta</label>
+                            {{ form.intervencion_propuesta }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="d-flex justify-content-end gap-2 mb-4">
+                    <button type="reset" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-x-circle me-2"></i>Limpiar
+                    </button>
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="bi bi-check-circle me-2"></i>Guardar Consulta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-completar el operador con el nombre del usuario
+    document.addEventListener('DOMContentLoaded', function() {
+        const operadorInput = document.querySelector('#id_operador');
+        if (operadorInput && !operadorInput.value) {
+            operadorInput.value = '{{ user.first_name }} {{ user.last_name }}'.trim() || '{{ user.username }}';
+        }
+        
+        // Establecer fecha de hoy por defecto
+        const fechaInput = document.querySelector('#id_fecha');
+        if (fechaInput && !fechaInput.value) {
+            const today = new Date().toISOString().split('T')[0];
+            fechaInput.value = today;
+        }
+    });
+</script>
+{% endblock %}

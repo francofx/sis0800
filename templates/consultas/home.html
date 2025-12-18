@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Sistema 0800 - Inicio{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="col-lg-8 text-center">
+            <div class="card shadow-lg">
+                <div class="card-body py-5">
+                    <h1 class="display-4 mb-4">
+                        <i class="bi bi-telephone-fill text-primary"></i>
+                    </h1>
+                    <h2 class="mb-4">Sistema de Gestión 0800</h2>
+                    <p class="lead text-muted mb-4">
+                        Plataforma integral para la carga y análisis de consultas telefónicas.
+                        Gestiona de manera eficiente la información de usuarios y genera informes detallados.
+                    </p>
+                    <hr class="my-4">
+                    <div class="row justify-content-center">
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 border-primary">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-clipboard-data display-4 text-primary mb-3"></i>
+                                    <h5>Carga de Datos</h5>
+                                    <p class="text-muted small">Registro completo de consultas con información detallada del usuario</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 border-success">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-graph-up display-4 text-success mb-3"></i>
+                                    <h5>Informes</h5>
+                                    <p class="text-muted small">Análisis estadístico con gráficos interactivos y filtros avanzados</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 border-info">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-shield-lock display-4 text-info mb-3"></i>
+                                    <h5>Control de Acceso</h5>
+                                    <p class="text-muted small">Sistema de roles con permisos diferenciados</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-2">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+                        </a>
+                        <a href="{% url 'registro' %}" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-person-plus me-2"></i>Registrarse
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

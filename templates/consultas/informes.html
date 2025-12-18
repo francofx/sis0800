@@ -1,0 +1,352 @@
+{% extends 'base.html' %}
+
+{% block title %}Informes - Sistema 0800{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-graph-up me-2"></i>Panel de Informes</h2>
+        <div>
+            <a href="{% url 'exportar_datos' %}?{{ request.GET.urlencode }}" class="btn btn-success">
+                <i class="bi bi-download me-2"></i>Exportar CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Estadística Principal -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card primary">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-xs fw-bold text-primary text-uppercase mb-1">Total Consultas</div>
+                            <div class="h2 mb-0 fw-bold">{{ total_consultas }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-clipboard-data display-4 text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="bi bi-funnel me-2"></i>Filtros de Búsqueda
+            <button class="btn btn-sm btn-outline-primary float-end" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosCollapse">
+                <i class="bi bi-chevron-down"></i> Mostrar/Ocultar
+            </button>
+        </div>
+        <div class="collapse show" id="filtrosCollapse">
+            <div class="card-body">
+                <form method="get" id="filterForm">
+                    <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label small">Fecha Desde</label>
+                            <input type="date" name="fecha_desde" class="form-control form-control-sm" value="{{ request.GET.fecha_desde }}">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label small">Fecha Hasta</label>
+                            <input type="date" name="fecha_hasta" class="form-control form-control-sm" value="{{ request.GET.fecha_hasta }}">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label small">Zona</label>
+                            <select name="zona" class="form-select form-select-sm">
+                                <option value="">Todas</option>
+                                <option value="Sur" {% if request.GET.zona == 'Sur' %}selected{% endif %}>Sur</option>
+                                <option value="Centro - Norte" {% if request.GET.zona == 'Centro - Norte' %}selected{% endif %}>Centro - Norte</option>
+                                <option value="Norte" {% if request.GET.zona == 'Norte' %}selected{% endif %}>Norte</option>
+                                <option value="Oeste" {% if request.GET.zona == 'Oeste' %}selected{% endif %}>Oeste</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label small">Tipo Consulta</label>
+                            <select name="consulta" class="form-select form-select-sm">
+                                <option value="">Todas</option>
+                                <option value="Directa" {% if request.GET.consulta == 'Directa' %}selected{% endif %}>Directa</option>
+                                <option value="Indirecta" {% if request.GET.consulta == 'Indirecta' %}selected{% endif %}>Indirecta</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label small">Sexo</label>
+                            <select name="sexo" class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                <option value="Hombre" {% if request.GET.sexo == 'Hombre' %}selected{% endif %}>Hombre</option>
+                                <option value="Mujer" {% if request.GET.sexo == 'Mujer' %}selected{% endif %}>Mujer</option>
+                                <option value="Otro" {% if request.GET.sexo == 'Otro' %}selected{% endif %}>Otro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label small">Tiempo Consumo</label>
+                            <select name="tiempo_consumo" class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                <option value="Menos de 1 año" {% if request.GET.tiempo_consumo == 'Menos de 1 año' %}selected{% endif %}>Menos de 1 año</option>
+                                <option value="De 1 años a 5" {% if request.GET.tiempo_consumo == 'De 1 años a 5' %}selected{% endif %}>De 1 a 5 años</option>
+                                <option value="de 5 años a 10" {% if request.GET.tiempo_consumo == 'de 5 años a 10' %}selected{% endif %}>De 5 a 10 años</option>
+                                <option value="Más de 10 años" {% if request.GET.tiempo_consumo == 'Más de 10 años' %}selected{% endif %}>Más de 10 años</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label small">Tratamiento Anterior</label>
+                            <select name="tratamiento_anterior" class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                <option value="SI" {% if request.GET.tratamiento_anterior == 'SI' %}selected{% endif %}>Sí</option>
+                                <option value="No" {% if request.GET.tratamiento_anterior == 'No' %}selected{% endif %}>No</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label small">Situación Social</label>
+                            <select name="situacion_social" class="form-select form-select-sm">
+                                <option value="">Todas</option>
+                                <option value="Situación de Calle" {% if request.GET.situacion_social == 'Situación de Calle' %}selected{% endif %}>Situación de Calle</option>
+                                <option value="Infancia" {% if request.GET.situacion_social == 'Infancia' %}selected{% endif %}>Infancia</option>
+                                <option value="Violencia" {% if request.GET.situacion_social == 'Violencia' %}selected{% endif %}>Violencia</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label small">Característica Judicial</label>
+                            <select name="caracteristica_judicial" class="form-select form-select-sm">
+                                <option value="">Todas</option>
+                                <option value="Judicializado" {% if request.GET.caracteristica_judicial == 'Judicializado' %}selected{% endif %}>Judicializado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label small">Usuario (nombre)</label>
+                            <input type="text" name="apellido_nombre_usuario" class="form-control form-control-sm" value="{{ request.GET.apellido_nombre_usuario }}" placeholder="Buscar por nombre...">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label small">Ciudad</label>
+                            <input type="text" name="ciudad" class="form-control form-control-sm" value="{{ request.GET.ciudad }}" placeholder="Buscar por ciudad...">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label small">Sustancia</label>
+                            <input type="text" name="tipo_sustancia" class="form-control form-control-sm" value="{{ request.GET.tipo_sustancia }}" placeholder="Buscar sustancia...">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label small">Operador</label>
+                            <input type="text" name="operador" class="form-control form-control-sm" value="{{ request.GET.operador }}" placeholder="Buscar operador...">
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search me-1"></i>Filtrar
+                        </button>
+                        <a href="{% url 'informes' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-1"></i>Limpiar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    {% if graficos %}
+    <div class="row mb-4">
+        {% if graficos.zona %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="chart-container">
+                <div id="chart-zona"></div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if graficos.sexo %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="chart-container">
+                <div id="chart-sexo"></div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if graficos.consulta %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="chart-container">
+                <div id="chart-consulta"></div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if graficos.tiempo_consumo %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="chart-container">
+                <div id="chart-tiempo"></div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if graficos.tratamiento %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="chart-container">
+                <div id="chart-tratamiento"></div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if graficos.situacion_social %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="chart-container">
+                <div id="chart-social"></div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if graficos.ciudad %}
+        <div class="col-md-12 col-lg-6 mb-4">
+            <div class="chart-container">
+                <div id="chart-ciudad"></div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if graficos.sustancias %}
+        <div class="col-md-12 col-lg-6 mb-4">
+            <div class="chart-container">
+                <div id="chart-sustancias"></div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Tabla de Datos -->
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-table me-2"></i>Listado de Consultas
+            <span class="badge bg-primary ms-2">{{ page_obj.paginator.count }} registros</span>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Zona</th>
+                            <th>Operador</th>
+                            <th>Usuario</th>
+                            <th>Consulta</th>
+                            <th>Ciudad</th>
+                            <th>Sustancia</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for consulta in page_obj %}
+                        <tr>
+                            <td>{{ consulta.fecha|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="badge badge-zona 
+                                    {% if consulta.zona == 'Sur' %}bg-success
+                                    {% elif consulta.zona == 'Centro - Norte' %}bg-info
+                                    {% elif consulta.zona == 'Norte' %}bg-warning text-dark
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ consulta.zona }}
+                                </span>
+                            </td>
+                            <td>{{ consulta.operador }}</td>
+                            <td>{{ consulta.apellido_nombre_usuario }}</td>
+                            <td>
+                                <span class="badge {% if consulta.consulta == 'Directa' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                    {{ consulta.consulta }}
+                                </span>
+                            </td>
+                            <td>{{ consulta.ciudad }}</td>
+                            <td>
+                                <span class="text-truncate d-inline-block" style="max-width: 150px;" title="{{ consulta.tipo_sustancia }}">
+                                    {{ consulta.tipo_sustancia|default:"-"|truncatewords:3 }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'detalle_consulta' consulta.pk %}" class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox display-4"></i>
+                                <p class="mt-2">No hay consultas que mostrar</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Paginación">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">
+                            <i class="bi bi-chevron-left"></i> Anterior
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">
+                            Siguiente <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    {% if graficos.zona %}
+    Plotly.newPlot('chart-zona', {{ graficos.zona|safe }}.data, {{ graficos.zona|safe }}.layout, {responsive: true});
+    {% endif %}
+    
+    {% if graficos.sexo %}
+    Plotly.newPlot('chart-sexo', {{ graficos.sexo|safe }}.data, {{ graficos.sexo|safe }}.layout, {responsive: true});
+    {% endif %}
+    
+    {% if graficos.consulta %}
+    Plotly.newPlot('chart-consulta', {{ graficos.consulta|safe }}.data, {{ graficos.consulta|safe }}.layout, {responsive: true});
+    {% endif %}
+    
+    {% if graficos.tiempo_consumo %}
+    Plotly.newPlot('chart-tiempo', {{ graficos.tiempo_consumo|safe }}.data, {{ graficos.tiempo_consumo|safe }}.layout, {responsive: true});
+    {% endif %}
+    
+    {% if graficos.tratamiento %}
+    Plotly.newPlot('chart-tratamiento', {{ graficos.tratamiento|safe }}.data, {{ graficos.tratamiento|safe }}.layout, {responsive: true});
+    {% endif %}
+    
+    {% if graficos.situacion_social %}
+    Plotly.newPlot('chart-social', {{ graficos.situacion_social|safe }}.data, {{ graficos.situacion_social|safe }}.layout, {responsive: true});
+    {% endif %}
+    
+    {% if graficos.ciudad %}
+    Plotly.newPlot('chart-ciudad', {{ graficos.ciudad|safe }}.data, {{ graficos.ciudad|safe }}.layout, {responsive: true});
+    {% endif %}
+    
+    {% if graficos.sustancias %}
+    Plotly.newPlot('chart-sustancias', {{ graficos.sustancias|safe }}.data, {{ graficos.sustancias|safe }}.layout, {responsive: true});
+    {% endif %}
+</script>
+{% endblock %}
