@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv/
+
+# Django
+*.log
+local_settings.py
+*.pot
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Misc
+*.md
+.env
+.env.*
+*.sqlite3.bak
+
+# Scripts de utilidad (no necesarios en producción)
+crear_grupo_operadores.py
+crear_usuarios_operadores.py
+import_csv.py
