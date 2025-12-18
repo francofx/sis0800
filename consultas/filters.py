@@ -9,7 +9,9 @@ class ConsultaFilter(django_filters.FilterSet):
     apellido_nombre_interlocutor = django_filters.CharFilter(lookup_expr='icontains', label='Interlocutor (contiene)')
     ciudad = django_filters.CharFilter(lookup_expr='icontains', label='Ciudad (contiene)')
     tipo_sustancia = django_filters.CharFilter(lookup_expr='icontains', label='Sustancia (contiene)')
-    operador = django_filters.CharFilter(lookup_expr='icontains', label='Operador (contiene)')
+    operador = django_filters.CharFilter(lookup_expr='exact', label='Operador')
+    situacion_social = django_filters.CharFilter(lookup_expr='icontains', label='Situación Social (contiene)')
+    caracteristica_judicial = django_filters.CharFilter(lookup_expr='icontains', label='Característica Judicial (contiene)')
     
     class Meta:
         model = Consulta
@@ -19,9 +21,8 @@ class ConsultaFilter(django_filters.FilterSet):
             'sexo': ['exact'],
             'tiempo_consumo': ['exact'],
             'tratamiento_anterior': ['exact'],
-            'situacion_social': ['exact'],
-            'caracteristica_judicial': ['exact'],
             'obra_social': ['exact'],
             'escolarizado': ['exact'],
             'riesgo_inminente': ['exact'],
+            'seguimiento': ['exact'],
         }

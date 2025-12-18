@@ -4,10 +4,8 @@ from django.contrib.auth.models import User
 
 class Consulta(models.Model):
     ZONA_CHOICES = [
-        ('Sur', 'Sur'),
         ('Centro - Norte', 'Centro - Norte'),
-        ('Norte', 'Norte'),
-        ('Oeste', 'Oeste'),
+        ('Sur', 'Sur'),
     ]
     
     CONSULTA_CHOICES = [
@@ -19,6 +17,8 @@ class Consulta(models.Model):
         ('Hombre', 'Hombre'),
         ('Mujer', 'Mujer'),
         ('Otro', 'Otro'),
+        ('No corresponde', 'No corresponde'),
+        ('No corresponde al tipo de llamada', 'No corresponde al tipo de llamada'),
     ]
     
     ESCOLARIZADO_CHOICES = [
@@ -53,15 +53,22 @@ class Consulta(models.Model):
     ]
     
     RIESGO_CHOICES = [
-        ('SI', 'Sí'),
-        ('No', 'No'),
+        ('Emergencia', 'Emergencia'),
+        ('Urgencia', 'Urgencia'),
+        ('Ninguno', 'Ninguno'),
+    ]
+    
+    SEGUIMIENTO_CHOICES = [
+        ('24hs', '24hs'),
+        ('48hs', '48hs'),
     ]
     
     SITUACION_SOCIAL_CHOICES = [
         ('Situación de Calle', 'Situación de Calle'),
         ('Infancia', 'Infancia'),
         ('Violencia', 'Violencia'),
-        ('', 'Sin especificar'),
+        ('Pueblos Originarios', 'Pueblos Originarios'),
+        ('Judicializado', 'Judicializado'),
     ]
     
     CARACTERISTICA_JUDICIAL_CHOICES = [
@@ -87,7 +94,7 @@ class Consulta(models.Model):
     dni = models.CharField(max_length=20, blank=True, null=True, verbose_name="DNI")
     fecha_nacimiento = models.CharField(max_length=50, blank=True, null=True, verbose_name="Fecha de Nacimiento")
     edad = models.CharField(max_length=20, blank=True, null=True, verbose_name="Edad")
-    sexo = models.CharField(max_length=20, choices=SEXO_CHOICES, verbose_name="Sexo")
+    sexo = models.CharField(max_length=50, choices=SEXO_CHOICES, verbose_name="Sexo")
     nacionalidad = models.CharField(max_length=50, default="Argentina", verbose_name="Nacionalidad")
     ciudad = models.CharField(max_length=100, verbose_name="Ciudad")
     barrio = models.CharField(max_length=100, blank=True, null=True, verbose_name="Barrio")
@@ -118,13 +125,13 @@ class Consulta(models.Model):
     
     # Datos de salud
     efector_salud_referencia = models.CharField(max_length=200, blank=True, null=True, verbose_name="Efector de Salud de Referencia")
-    riesgo_inminente = models.CharField(max_length=5, choices=RIESGO_CHOICES, blank=True, null=True, verbose_name="Riesgo Inminente")
+    riesgo_inminente = models.CharField(max_length=20, choices=RIESGO_CHOICES, blank=True, null=True, verbose_name="Riesgo Inminente")
     institucion_derivado = models.CharField(max_length=200, blank=True, null=True, verbose_name="Institución/Efector Derivado")
-    seguimiento = models.TextField(blank=True, null=True, verbose_name="Seguimiento")
+    seguimiento = models.CharField(max_length=10, choices=SEGUIMIENTO_CHOICES, blank=True, null=True, verbose_name="Seguimiento")
     
     # Datos sociales
-    situacion_social = models.CharField(max_length=50, choices=SITUACION_SOCIAL_CHOICES, blank=True, null=True, verbose_name="Situación Social")
-    caracteristica_judicial = models.CharField(max_length=50, choices=CARACTERISTICA_JUDICIAL_CHOICES, blank=True, null=True, verbose_name="Característica Judicial")
+    situacion_social = models.TextField(blank=True, null=True, verbose_name="Situación Social")
+    caracteristica_judicial = models.CharField(max_length=200, blank=True, null=True, verbose_name="Característica Judicial")
     intervencion_propuesta = models.TextField(blank=True, null=True, verbose_name="Intervención Propuesta")
     
     # Auditoría

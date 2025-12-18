@@ -71,7 +71,7 @@ def logout_view(request):
 def cargar_consulta(request):
     """Formulario para cargar una nueva consulta"""
     if request.method == 'POST':
-        form = ConsultaForm(request.POST)
+        form = ConsultaForm(request.POST, user=request.user)
         if form.is_valid():
             consulta = form.save(commit=False)
             consulta.creado_por = request.user
@@ -79,8 +79,52 @@ def cargar_consulta(request):
             messages.success(request, '¡Consulta cargada exitosamente!')
             return redirect('cargar_consulta')
     else:
-        form = ConsultaForm()
+        form = ConsultaForm(user=request.user)
     return render(request, 'consultas/cargar_consulta.html', {'form': form})
+
+
+@login_required
+def mis_consultas(request):
+    """Listado de consultas cargadas por el operador actual"""
+    # Obtener nombre del operador actual
+    nombre_operador = f"{request.user.last_name} {request.user.first_name}".strip()
+    
+    # Filtrar consultas por el operador actual (por nombre o por creado_por)
+    consultas = Consulta.objects.filter(
+        Q(operador=nombre_operador) | Q(creado_por=request.user)
+    ).distinct()
+    
+    # Búsqueda general
+    busqueda = request.GET.get('q', '').strip()
+    if busqueda:
+        consultas = consultas.filter(
+            Q(apellido_nombre_usuario__icontains=busqueda) |
+            Q(apellido_nombre_interlocutor__icontains=busqueda) |
+            Q(dni__icontains=busqueda) |
+            Q(ciudad__icontains=busqueda) |
+            Q(barrio__icontains=busqueda) |
+            Q(telefono__icontains=busqueda) |
+            Q(telefono_interlocutor__icontains=busqueda) |
+            Q(motivo_consulta__icontains=busqueda) |
+            Q(tipo_sustancia__icontains=busqueda) |
+            Q(intervencion_propuesta__icontains=busqueda) |
+            Q(zona__icontains=busqueda) |
+            Q(consulta__icontains=busqueda)
+        )
+    
+    consultas = consultas.order_by('-fecha', '-marca_temporal')
+    
+    # Paginación
+    paginator = Paginator(consultas, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'consultas/mis_consultas.html', {
+        'page_obj': page_obj,
+        'total_consultas': consultas.count(),
+        'nombre_operador': nombre_operador,
+        'busqueda': busqueda,
+    })
 
 
 @login_required
@@ -103,80 +147,57 @@ def informes(request):
     
     if total_consultas > 0:
         # Gráfico de consultas por zona
-        zona_data = consultas.values('zona').annotate(count=Count('id')).order_by('-count')
+        zona_data = list(consultas.values('zona').annotate(count=Count('id')).order_by('-count'))
         if zona_data:
-            fig_zona = px.pie(
-                values=[d['count'] for d in zona_data],
-                names=[d['zona'] or 'Sin zona' for d in zona_data],
-                title='Consultas por Zona',
-                hole=0.4,
-                color_discrete_sequence=px.colors.qualitative.Set2
-            )
-            fig_zona.update_layout(margin=dict(l=20, r=20, t=40, b=20))
+            labels = [d['zona'] or 'Sin zona' for d in zona_data]
+            values = [d['count'] for d in zona_data]
+            fig_zona = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.4)])
+            fig_zona.update_layout(title='Consultas por Zona', margin=dict(l=20, r=20, t=40, b=20))
             graficos['zona'] = json.dumps(fig_zona, cls=PlotlyJSONEncoder)
         
         # Gráfico de consultas por sexo
-        sexo_data = consultas.values('sexo').annotate(count=Count('id')).order_by('-count')
+        sexo_data = list(consultas.exclude(sexo__isnull=True).exclude(sexo='').values('sexo').annotate(count=Count('id')).order_by('-count'))
         if sexo_data:
-            fig_sexo = px.bar(
-                x=[d['sexo'] or 'Sin especificar' for d in sexo_data],
-                y=[d['count'] for d in sexo_data],
-                title='Consultas por Sexo',
-                labels={'x': 'Sexo', 'y': 'Cantidad'},
-                color=[d['sexo'] or 'Sin especificar' for d in sexo_data],
-                color_discrete_sequence=px.colors.qualitative.Pastel
-            )
-            fig_sexo.update_layout(margin=dict(l=20, r=20, t=40, b=20), showlegend=False)
+            x_vals = [d['sexo'] for d in sexo_data]
+            y_vals = [d['count'] for d in sexo_data]
+            fig_sexo = go.Figure(data=[go.Bar(x=x_vals, y=y_vals, marker_color='#4e73df')])
+            fig_sexo.update_layout(title='Consultas por Sexo', xaxis_title='Sexo', yaxis_title='Cantidad', margin=dict(l=20, r=20, t=40, b=20))
             graficos['sexo'] = json.dumps(fig_sexo, cls=PlotlyJSONEncoder)
         
         # Gráfico de tiempo de consumo
-        tiempo_data = consultas.exclude(tiempo_consumo__isnull=True).exclude(tiempo_consumo='').values('tiempo_consumo').annotate(count=Count('id')).order_by('-count')
+        tiempo_data = list(consultas.exclude(tiempo_consumo__isnull=True).exclude(tiempo_consumo='').values('tiempo_consumo').annotate(count=Count('id')).order_by('-count'))
         if tiempo_data:
-            fig_tiempo = px.bar(
-                x=[d['tiempo_consumo'] for d in tiempo_data],
-                y=[d['count'] for d in tiempo_data],
-                title='Tiempo de Consumo',
-                labels={'x': 'Tiempo', 'y': 'Cantidad'},
-                color_discrete_sequence=['#36b9cc']
-            )
-            fig_tiempo.update_layout(margin=dict(l=20, r=20, t=40, b=20))
+            x_vals = [d['tiempo_consumo'] for d in tiempo_data]
+            y_vals = [d['count'] for d in tiempo_data]
+            fig_tiempo = go.Figure(data=[go.Bar(x=x_vals, y=y_vals, marker_color='#36b9cc')])
+            fig_tiempo.update_layout(title='Tiempo de Consumo', xaxis_title='Tiempo', yaxis_title='Cantidad', margin=dict(l=20, r=20, t=40, b=20))
             graficos['tiempo_consumo'] = json.dumps(fig_tiempo, cls=PlotlyJSONEncoder)
         
         # Gráfico de tipo de consulta
-        consulta_data = consultas.values('consulta').annotate(count=Count('id')).order_by('-count')
+        consulta_data = list(consultas.values('consulta').annotate(count=Count('id')).order_by('-count'))
         if consulta_data:
-            fig_consulta = px.pie(
-                values=[d['count'] for d in consulta_data],
-                names=[d['consulta'] or 'Sin especificar' for d in consulta_data],
-                title='Tipo de Consulta (Directa/Indirecta)',
-                color_discrete_sequence=px.colors.qualitative.Safe
-            )
-            fig_consulta.update_layout(margin=dict(l=20, r=20, t=40, b=20))
+            labels = [d['consulta'] or 'Sin especificar' for d in consulta_data]
+            values = [d['count'] for d in consulta_data]
+            fig_consulta = go.Figure(data=[go.Pie(labels=labels, values=values)])
+            fig_consulta.update_layout(title='Tipo de Consulta (Directa/Indirecta)', margin=dict(l=20, r=20, t=40, b=20))
             graficos['consulta'] = json.dumps(fig_consulta, cls=PlotlyJSONEncoder)
         
         # Gráfico de tratamiento anterior
-        trat_data = consultas.exclude(tratamiento_anterior__isnull=True).exclude(tratamiento_anterior='').values('tratamiento_anterior').annotate(count=Count('id')).order_by('-count')
+        trat_data = list(consultas.exclude(tratamiento_anterior__isnull=True).exclude(tratamiento_anterior='').values('tratamiento_anterior').annotate(count=Count('id')).order_by('-count'))
         if trat_data:
-            fig_trat = px.pie(
-                values=[d['count'] for d in trat_data],
-                names=['Sí' if d['tratamiento_anterior'] == 'SI' else 'No' for d in trat_data],
-                title='¿Tuvo Tratamiento Anterior?',
-                color_discrete_sequence=['#1cc88a', '#e74a3b']
-            )
-            fig_trat.update_layout(margin=dict(l=20, r=20, t=40, b=20))
+            labels = ['Sí' if d['tratamiento_anterior'] == 'SI' else 'No' for d in trat_data]
+            values = [d['count'] for d in trat_data]
+            fig_trat = go.Figure(data=[go.Pie(labels=labels, values=values)])
+            fig_trat.update_layout(title='¿Tuvo Tratamiento Anterior?', margin=dict(l=20, r=20, t=40, b=20))
             graficos['tratamiento'] = json.dumps(fig_trat, cls=PlotlyJSONEncoder)
         
         # Gráfico de consultas por ciudad (top 10)
-        ciudad_data = consultas.exclude(ciudad__isnull=True).exclude(ciudad='').values('ciudad').annotate(count=Count('id')).order_by('-count')[:10]
+        ciudad_data = list(consultas.exclude(ciudad__isnull=True).exclude(ciudad='').values('ciudad').annotate(count=Count('id')).order_by('-count')[:10])
         if ciudad_data:
-            fig_ciudad = px.bar(
-                x=[d['ciudad'] for d in ciudad_data],
-                y=[d['count'] for d in ciudad_data],
-                title='Top 10 Ciudades con más Consultas',
-                labels={'x': 'Ciudad', 'y': 'Cantidad'},
-                color_discrete_sequence=['#4e73df']
-            )
-            fig_ciudad.update_layout(margin=dict(l=20, r=20, t=40, b=20), xaxis_tickangle=-45)
+            x_vals = [d['ciudad'] for d in ciudad_data]
+            y_vals = [d['count'] for d in ciudad_data]
+            fig_ciudad = go.Figure(data=[go.Bar(x=x_vals, y=y_vals, marker_color='#4e73df')])
+            fig_ciudad.update_layout(title='Top 10 Ciudades con más Consultas', xaxis_title='Ciudad', yaxis_title='Cantidad', margin=dict(l=20, r=20, t=40, b=20), xaxis_tickangle=-45)
             graficos['ciudad'] = json.dumps(fig_ciudad, cls=PlotlyJSONEncoder)
         
         # Análisis de sustancias
@@ -190,42 +211,59 @@ def informes(request):
         
         if sustancias_count:
             sorted_sustancias = sorted(sustancias_count.items(), key=lambda x: x[1], reverse=True)[:10]
-            fig_sustancias = px.bar(
-                x=[s[0] for s in sorted_sustancias],
-                y=[s[1] for s in sorted_sustancias],
-                title='Sustancias más Reportadas',
-                labels={'x': 'Sustancia', 'y': 'Menciones'},
-                color_discrete_sequence=['#f6c23e']
-            )
-            fig_sustancias.update_layout(margin=dict(l=20, r=20, t=40, b=20), xaxis_tickangle=-45)
+            x_vals = [s[0] for s in sorted_sustancias]
+            y_vals = [s[1] for s in sorted_sustancias]
+            fig_sustancias = go.Figure(data=[go.Bar(x=x_vals, y=y_vals, marker_color='#f6c23e')])
+            fig_sustancias.update_layout(title='Sustancias más Reportadas', xaxis_title='Sustancia', yaxis_title='Menciones', margin=dict(l=20, r=20, t=40, b=20), xaxis_tickangle=-45)
             graficos['sustancias'] = json.dumps(fig_sustancias, cls=PlotlyJSONEncoder)
         
         # Gráfico de situación social
-        sit_social_data = consultas.exclude(situacion_social__isnull=True).exclude(situacion_social='').values('situacion_social').annotate(count=Count('id')).order_by('-count')
+        sit_social_data = list(consultas.exclude(situacion_social__isnull=True).exclude(situacion_social='').values('situacion_social').annotate(count=Count('id')).order_by('-count'))
         if sit_social_data:
-            fig_social = px.pie(
-                values=[d['count'] for d in sit_social_data],
-                names=[d['situacion_social'] for d in sit_social_data],
-                title='Situación Social',
-                color_discrete_sequence=px.colors.qualitative.Set3
-            )
-            fig_social.update_layout(margin=dict(l=20, r=20, t=40, b=20))
+            labels = [d['situacion_social'] for d in sit_social_data]
+            values = [d['count'] for d in sit_social_data]
+            fig_social = go.Figure(data=[go.Pie(labels=labels, values=values)])
+            fig_social.update_layout(title='Situación Social', margin=dict(l=20, r=20, t=40, b=20))
             graficos['situacion_social'] = json.dumps(fig_social, cls=PlotlyJSONEncoder)
+        
+        # Gráfico de consultas por operador
+        operador_data = list(consultas.exclude(operador__isnull=True).exclude(operador='').values('operador').annotate(count=Count('id')).order_by('-count'))
+        if operador_data:
+            x_vals = [d['operador'] for d in operador_data]
+            y_vals = [d['count'] for d in operador_data]
+            fig_operador = go.Figure(data=[go.Bar(x=x_vals, y=y_vals, marker_color='#6f42c1')])
+            fig_operador.update_layout(title='Consultas por Operador', xaxis_title='Operador', yaxis_title='Cantidad', margin=dict(l=20, r=20, t=40, b=20), xaxis_tickangle=-45)
+            graficos['operador'] = json.dumps(fig_operador, cls=PlotlyJSONEncoder)
+    
+    # Obtener lista de operadores únicos para el filtro
+    operadores = Consulta.objects.exclude(
+        operador__isnull=True
+    ).exclude(
+        operador=''
+    ).values_list('operador', flat=True).distinct().order_by('operador')
     
     context = {
         'filterset': filterset,
         'page_obj': page_obj,
         'total_consultas': total_consultas,
         'graficos': graficos,
+        'operadores': operadores,
     }
     return render(request, 'consultas/informes.html', context)
 
 
 @login_required
-@user_passes_test(is_admin)
 def detalle_consulta(request, pk):
     """Ver detalle de una consulta"""
     consulta = get_object_or_404(Consulta, pk=pk)
+    
+    # Si no es admin, solo puede ver sus propias consultas
+    if not is_admin(request.user):
+        nombre_operador = f"{request.user.last_name} {request.user.first_name}".strip()
+        if consulta.operador != nombre_operador and consulta.creado_por != request.user:
+            messages.error(request, 'No tienes permiso para ver esta consulta.')
+            return redirect('mis_consultas')
+    
     return render(request, 'consultas/detalle_consulta.html', {'consulta': consulta})
 
 

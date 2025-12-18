@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Informes - Sistema 0800{% endblock %}
+{% block title %}Informes - Sistema 0800-268-5640{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
@@ -57,10 +57,8 @@
                             <label class="form-label small">Zona</label>
                             <select name="zona" class="form-select form-select-sm">
                                 <option value="">Todas</option>
-                                <option value="Sur" {% if request.GET.zona == 'Sur' %}selected{% endif %}>Sur</option>
                                 <option value="Centro - Norte" {% if request.GET.zona == 'Centro - Norte' %}selected{% endif %}>Centro - Norte</option>
-                                <option value="Norte" {% if request.GET.zona == 'Norte' %}selected{% endif %}>Norte</option>
-                                <option value="Oeste" {% if request.GET.zona == 'Oeste' %}selected{% endif %}>Oeste</option>
+                                <option value="Sur" {% if request.GET.zona == 'Sur' %}selected{% endif %}>Sur</option>
                             </select>
                         </div>
                         <div class="col-md-2 mb-3">
@@ -78,6 +76,8 @@
                                 <option value="Hombre" {% if request.GET.sexo == 'Hombre' %}selected{% endif %}>Hombre</option>
                                 <option value="Mujer" {% if request.GET.sexo == 'Mujer' %}selected{% endif %}>Mujer</option>
                                 <option value="Otro" {% if request.GET.sexo == 'Otro' %}selected{% endif %}>Otro</option>
+                                <option value="No corresponde" {% if request.GET.sexo == 'No corresponde' %}selected{% endif %}>No corresponde</option>
+                                <option value="No corresponde al tipo de llamada" {% if request.GET.sexo == 'No corresponde al tipo de llamada' %}selected{% endif %}>No corresponde al tipo de llamada</option>
                             </select>
                         </div>
                         <div class="col-md-2 mb-3">
@@ -107,14 +107,13 @@
                                 <option value="Situación de Calle" {% if request.GET.situacion_social == 'Situación de Calle' %}selected{% endif %}>Situación de Calle</option>
                                 <option value="Infancia" {% if request.GET.situacion_social == 'Infancia' %}selected{% endif %}>Infancia</option>
                                 <option value="Violencia" {% if request.GET.situacion_social == 'Violencia' %}selected{% endif %}>Violencia</option>
+                                <option value="Pueblos Originarios" {% if request.GET.situacion_social == 'Pueblos Originarios' %}selected{% endif %}>Pueblos Originarios</option>
+                                <option value="Judicializado" {% if request.GET.situacion_social == 'Judicializado' %}selected{% endif %}>Judicializado</option>
                             </select>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label class="form-label small">Característica Judicial</label>
-                            <select name="caracteristica_judicial" class="form-select form-select-sm">
-                                <option value="">Todas</option>
-                                <option value="Judicializado" {% if request.GET.caracteristica_judicial == 'Judicializado' %}selected{% endif %}>Judicializado</option>
-                            </select>
+                            <input type="text" name="caracteristica_judicial" class="form-control form-control-sm" value="{{ request.GET.caracteristica_judicial }}" placeholder="Buscar...">
                         </div>
                         <div class="col-md-3 mb-3">
                             <label class="form-label small">Usuario (nombre)</label>
@@ -132,7 +131,29 @@
                         </div>
                         <div class="col-md-3 mb-3">
                             <label class="form-label small">Operador</label>
-                            <input type="text" name="operador" class="form-control form-control-sm" value="{{ request.GET.operador }}" placeholder="Buscar operador...">
+                            <select name="operador" class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                {% for op in operadores %}
+                                <option value="{{ op }}" {% if request.GET.operador == op %}selected{% endif %}>{{ op }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label small">Riesgo Inminente</label>
+                            <select name="riesgo_inminente" class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                <option value="Emergencia" {% if request.GET.riesgo_inminente == 'Emergencia' %}selected{% endif %}>Emergencia</option>
+                                <option value="Urgencia" {% if request.GET.riesgo_inminente == 'Urgencia' %}selected{% endif %}>Urgencia</option>
+                                <option value="Ninguno" {% if request.GET.riesgo_inminente == 'Ninguno' %}selected{% endif %}>Ninguno</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label small">Seguimiento</label>
+                            <select name="seguimiento" class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                <option value="24hs" {% if request.GET.seguimiento == '24hs' %}selected{% endif %}>24hs</option>
+                                <option value="48hs" {% if request.GET.seguimiento == '48hs' %}selected{% endif %}>48hs</option>
+                            </select>
                         </div>
                     </div>
                     <div class="d-flex gap-2">
@@ -211,6 +232,14 @@
         <div class="col-md-12 col-lg-6 mb-4">
             <div class="chart-container">
                 <div id="chart-sustancias"></div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if graficos.operador %}
+        <div class="col-md-12 col-lg-6 mb-4">
+            <div class="chart-container">
+                <div id="chart-operador"></div>
             </div>
         </div>
         {% endif %}
@@ -347,6 +376,10 @@
     
     {% if graficos.sustancias %}
     Plotly.newPlot('chart-sustancias', {{ graficos.sustancias|safe }}.data, {{ graficos.sustancias|safe }}.layout, {responsive: true});
+    {% endif %}
+    
+    {% if graficos.operador %}
+    Plotly.newPlot('chart-operador', {{ graficos.operador|safe }}.data, {{ graficos.operador|safe }}.layout, {responsive: true});
     {% endif %}
 </script>
 {% endblock %}

@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}Cargar Consulta - Sistema 0800{% endblock %}
+{% block title %}Formulario de Carga de Datos - Sistema 0800-268-5640{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2><i class="bi bi-clipboard-plus me-2"></i>Cargar Nueva Consulta</h2>
+                <h2><i class="bi bi-clipboard-plus me-2"></i>FORMULARIO DE CARGA DE DATOS 0800</h2>
                 <span class="badge bg-primary fs-6">
                     <i class="bi bi-person me-1"></i>Operador: {{ user.first_name }} {{ user.last_name }}
                 </span>
@@ -20,21 +20,17 @@
                 <div class="form-section">
                     <h5><i class="bi bi-info-circle me-2"></i>Datos Generales de la Consulta</h5>
                     <div class="row">
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Fecha *</label>
                             {{ form.fecha }}
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Zona *</label>
                             {{ form.zona }}
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Operador *</label>
                             {{ form.operador }}
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label">Tipo de Consulta *</label>
-                            {{ form.consulta }}
                         </div>
                     </div>
                 </div>
@@ -43,15 +39,19 @@
                 <div class="form-section">
                     <h5><i class="bi bi-person-badge me-2"></i>Datos del Interlocutor</h5>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Tipo de Consulta *</label>
+                            {{ form.consulta }}
+                        </div>
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Apellido y Nombre Interlocutor *</label>
                             {{ form.apellido_nombre_interlocutor }}
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Teléfono Interlocutor</label>
                             {{ form.telefono_interlocutor }}
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Tipo de Vínculo (si es indirecta)</label>
                             {{ form.tipo_vinculo }}
                         </div>
@@ -119,24 +119,14 @@
                 <div class="form-section">
                     <h5><i class="bi bi-mortarboard me-2"></i>Datos Educativos y Laborales</h5>
                     <div class="row">
-                        <div class="col-md-2 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Escolarizado</label>
                             {{ form.escolarizado }}
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-5 mb-3">
                             <label class="form-label">Etapa Escolar</label>
                             {{ form.etapa_escolar }}
                         </div>
-                        <div class="col-md-2 mb-3">
-                            <label class="form-label">Obra Social</label>
-                            {{ form.obra_social }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Nombre Obra Social</label>
-                            {{ form.nombre_obra_social }}
-                        </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Ocupación</label>
                             {{ form.ocupacion }}
@@ -173,7 +163,14 @@
                         </div>
                         <div class="col-md-9 mb-3">
                             <label class="form-label">Tipo de Sustancia que Consume</label>
-                            {{ form.tipo_sustancia }}
+                            <div class="sustancias-container p-2 border rounded" style="max-height: 150px; overflow-y: auto;">
+                                {% for checkbox in form.tipo_sustancia %}
+                                <div class="form-check form-check-inline">
+                                    {{ checkbox.tag }}
+                                    <label class="form-check-label" for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
                     <div class="row">
@@ -192,15 +189,25 @@
                 <div class="form-section">
                     <h5><i class="bi bi-hospital me-2"></i>Datos de Salud y Derivación</h5>
                     <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Obra Social</label>
+                            {{ form.obra_social }}
+                        </div>
                         <div class="col-md-4 mb-3">
+                            <label class="form-label">Nombre Obra Social</label>
+                            {{ form.nombre_obra_social }}
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Efector de Salud de Referencia</label>
                             {{ form.efector_salud_referencia }}
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-2 mb-3">
                             <label class="form-label">Riesgo Inminente</label>
                             {{ form.riesgo_inminente }}
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-10 mb-3">
                             <label class="form-label">Institución/Efector Derivado</label>
                             {{ form.institucion_derivado }}
                         </div>
@@ -217,9 +224,16 @@
                 <div class="form-section">
                     <h5><i class="bi bi-people me-2"></i>Situación Social y Judicial</h5>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-8 mb-3">
                             <label class="form-label">Situación Social</label>
-                            {{ form.situacion_social }}
+                            <div class="situacion-container p-2 border rounded">
+                                {% for checkbox in form.situacion_social %}
+                                <div class="form-check form-check-inline">
+                                    {{ checkbox.tag }}
+                                    <label class="form-check-label" for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Característica Judicial</label>
@@ -263,6 +277,28 @@
         if (fechaInput && !fechaInput.value) {
             const today = new Date().toISOString().split('T')[0];
             fechaInput.value = today;
+        }
+        
+        // Calcular edad automáticamente cuando se ingresa fecha de nacimiento
+        const fechaNacimientoInput = document.querySelector('#id_fecha_nacimiento');
+        const edadInput = document.querySelector('#id_edad');
+        
+        if (fechaNacimientoInput && edadInput) {
+            fechaNacimientoInput.addEventListener('change', function() {
+                if (this.value) {
+                    const fechaNac = new Date(this.value);
+                    const hoy = new Date();
+                    let edad = hoy.getFullYear() - fechaNac.getFullYear();
+                    const mes = hoy.getMonth() - fechaNac.getMonth();
+                    
+                    // Si no ha cumplido años este año, restar 1
+                    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+                        edad--;
+                    }
+                    
+                    edadInput.value = edad;
+                }
+            });
         }
     });
 </script>

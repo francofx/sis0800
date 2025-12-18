@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Consultas - Sistema 0800-268-5640{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-list-check me-2"></i>Mis Consultas</h2>
+            <p class="text-muted mb-0">Operador: <strong>{{ nombre_operador }}</strong></p>
+        </div>
+        <a href="{% url 'cargar_consulta' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nueva Consulta
+        </a>
+    </div>
+
+    <!-- Estadística -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card primary">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-xs fw-bold text-primary text-uppercase mb-1">Total Mis Consultas</div>
+                            <div class="h2 mb-0 fw-bold">{{ total_consultas }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-clipboard-check display-4 text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buscador -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-center">
+                <div class="col-md-10">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" name="q" class="form-control" 
+                               placeholder="Buscar por nombre, DNI, ciudad, barrio, teléfono, motivo, sustancia, zona..." 
+                               value="{{ busqueda }}">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search me-1"></i>Buscar
+                    </button>
+                </div>
+            </form>
+            {% if busqueda %}
+            <div class="mt-2">
+                <span class="text-muted">Resultados para: <strong>"{{ busqueda }}"</strong></span>
+                <a href="{% url 'mis_consultas' %}" class="btn btn-sm btn-outline-secondary ms-2">
+                    <i class="bi bi-x-circle me-1"></i>Limpiar búsqueda
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tabla de Consultas -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-table me-2"></i>Consultas Cargadas</span>
+            <span class="badge bg-primary">{{ page_obj.paginator.count }} registros</span>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Zona</th>
+                            <th>Usuario Consultante</th>
+                            <th>Tipo Consulta</th>
+                            <th>Ciudad</th>
+                            <th>Motivo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for consulta in page_obj %}
+                        <tr>
+                            <td>{{ consulta.fecha|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="badge badge-zona 
+                                    {% if consulta.zona == 'Sur' %}bg-success
+                                    {% elif consulta.zona == 'Centro - Norte' %}bg-info
+                                    {% elif consulta.zona == 'Norte' %}bg-warning text-dark
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ consulta.zona }}
+                                </span>
+                            </td>
+                            <td>{{ consulta.apellido_nombre_usuario }}</td>
+                            <td>
+                                <span class="badge {% if consulta.consulta == 'Directa' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                    {{ consulta.consulta }}
+                                </span>
+                            </td>
+                            <td>{{ consulta.ciudad }}</td>
+                            <td>
+                                <span class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ consulta.motivo_consulta }}">
+                                    {{ consulta.motivo_consulta|truncatewords:8 }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'detalle_consulta' consulta.pk %}" class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox display-4"></i>
+                                {% if busqueda %}
+                                <p class="mt-2">No se encontraron consultas con "<strong>{{ busqueda }}</strong>"</p>
+                                <a href="{% url 'mis_consultas' %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-circle me-1"></i>Limpiar búsqueda
+                                </a>
+                                {% else %}
+                                <p class="mt-2">No has cargado consultas aún</p>
+                                <a href="{% url 'cargar_consulta' %}" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle me-2"></i>Cargar Primera Consulta
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Paginación">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}">
+                            <i class="bi bi-chevron-left"></i> Anterior
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}">
+                            Siguiente <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
